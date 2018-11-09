@@ -1,0 +1,1 @@
+To prove the efficacy of SAE-RF method proposed, we need to compare the result with an equivalent neural network. So, we designed this bp_neral_network to verify our proposed metod.
