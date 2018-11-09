@@ -100,20 +100,18 @@ end
 
      trainLabels =trainLabels;
 
-    testLabels1 =  testLabels;%测试集标签  
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%尝试产生SDA
+    testLabels1 =  testLabels;%TEST SET LABEL  
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% mRMR
 target= trainLabels;
-  %SDA: stepwise discriminant analysis
+ 
  train_data_mrmr=train_data(:,142:951);
  numF = size(train_data_mrmr,2);
-%  param.k=120;
-%  param.type=1;
+
  [mRMRdataset] =mRMRfeatureSelect( train_data_mrmr, trainLabels);
  ranking=mRMRdataset.mrmrFea
 %  k=100;
  train_data_mrmr2 = train_data_mrmr(:,ranking);
 
-%   idx_sda = sda2(train_data_sda,target,logname)   
    
    trainData=[train_data(:,1:36)  train_data(:,75:110) train_data(:,112:115) train_data_mrmr2 train_data(:,952:end)];            %trainSet
 
@@ -132,7 +130,7 @@ target= trainLabels;
 
 
  
- net=patternnet([50 30]);
+ net=patternnet([300 300]);
  net.trainParam.epochs=1000; %最大训练次数（缺省值为10）
 net.trainParam.show=25;%显示训练迭代过程（NaN表示不显示，缺省为25），每25次显示一次
 net.trainParam.showCommandLine=0;%显示命令行（默认值是0） 0表示不显示
@@ -143,7 +141,7 @@ net.trainParam.min_grad=1e-5;%最小梯度要求（缺省为1e-10）
 net.trainParam.max_fail=5;%最大失败次数（缺省为5）
 net.performFcn='mse';%性能函数
 
-    %net.trainParam.showWindow=0;
+    
     trainLabels7 = ind2vec( trainLabels');
     testLabels7 = ind2vec( testLabels');
     net = train(net,trainData',trainLabels7);
@@ -157,8 +155,8 @@ net.performFcn='mse';%性能函数
     meanAUC = mean(cell2mat(AUC))
     stdAUC = std(cell2mat(AUC))
 
-%% 结果分析
-%根据网络输出找出数据属于哪类
+%% Result analysis
+%net output
 for i=1:size(testData1,1)
     if isnan(y(1,i)) ~= 1
     output_fore(i)=find(y(:,i)==max(y(:,i)));
@@ -167,7 +165,7 @@ for i=1:size(testData1,1)
     end
 end
 
-%BP网络预测误差
+%BP net prediction error
 error=output_fore-test_y
 
 sum_error=sum(error~=0)
@@ -182,7 +180,7 @@ hold on
 plot(label_all0(number(inputSize+1:size(number,2)))','b')
 legend(' Predicted Classes','Ture Classes')
 
-%画出误差图
+%plot error figure
 figure(2)
 plot(error)
 title('BP network classification error','fontsize',12)
@@ -192,13 +190,14 @@ toc
 end
 acc=(size(number,2)-sum_acc)/size(number,2)
 save bp_acc acc
-%画出误差图
+%plot error figure
 figure(15)
 plot(result2)
 title('BP network classification error','fontsize',12)
 xlabel('Human Tissue Image Numbers','fontsize',12)
 ylabel('Classification Error','fontsize',12)
 toc
+%plot ROC figure
  CatNames = {'1 Cytopl', '2 ER', '3 Gol', '4 Lyso', '5 Mito', ...
         '6 Nucl', '7 Vesi'};
     saveDir='./output/';
